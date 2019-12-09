@@ -6,9 +6,9 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestOptionsScopeFlags(t *testing.T) {
+func TestScopeToFlags(t *testing.T) {
 	tests := []struct {
-		scope OptionsScope
+		scope Scope
 		flags string
 	}{
 		{0, ""},
@@ -22,6 +22,6 @@ func TestOptionsScopeFlags(t *testing.T) {
 	}
 
 	for _, tt := range tests {
-		assert.Equal(t, tt.flags, OptionsScopeFlags(tt.scope))
+		assert.Equal(t, tt.flags, ScopeToFlags(tt.scope))
 	}
 }

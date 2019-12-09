@@ -1,21 +1,21 @@
 package tmux
 
-// OptionsScope represents one of the five scopes that Tmux holds options
+// Scope represents one of the five scopes that Tmux holds options
 // within.
-type OptionsScope int
+type Scope int
 
 const (
-	Server OptionsScope = iota + 1
+	Server Scope = iota + 1
 	GlobalSession
 	Session
 	GlobalWindow
 	Window
 )
 
-// OptionsScopeFlags converts a given OptionsScope to the command line flags
+// ScopeToFlags converts a given OptionsScope to the command line flags
 // needed to restrict "set-option" and "show-options" commands to the scope in
 // question.
-func OptionsScopeFlags(scope OptionsScope) string {
+func ScopeToFlags(scope Scope) string {
 	switch scope {
 	case 0, Session:
 		return ""

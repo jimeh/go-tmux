@@ -4,10 +4,10 @@ import (
 	"bufio"
 	"bytes"
 	"regexp"
+	"strconv"
 )
 
 var optMatcher = regexp.MustCompile(`^\s*([@\w-][\w-]+)\s+(.*)$`)
-var quote = []byte(`"`)
 
 // Tmux enables easily running tmux commands.
 type Tmux struct {
@@ -49,8 +49,10 @@ func (s *Tmux) Args() []string {
 	return args
 }
 
-func (s *Tmux) GetOptions(scope OptionsScope) (map[string]string, error) {
-	out, err := s.Exec("show-options", OptionsScopeFlags(scope))
+// GetOptions uses the "show-options" command to get all options within given
+// SCOPE.
+func (s *Tmux) GetOptions(scope Scope) (Options, error) {
+	out, err := s.Exec("show-options", ScopeToFlags(scope))
 	if err != nil {
 		return nil, err
 	}
@@ -58,24 +60,24 @@ func (s *Tmux) GetOptions(scope OptionsScope) (map[string]string, error) {
 	return s.parseOptions(out), nil
 }
 
-func (s *Tmux) parseOptions(options []byte) map[string]string {
+func (s *Tmux) parseOptions(options []byte) Options {
 	scanner := bufio.NewScanner(bytes.NewBuffer(options))
-	result := map[string]string{}
+	result := Options{}
 
 	for scanner.Scan() {
 		match := optMatcher.FindSubmatch(scanner.Bytes())
 		if len(match) > 2 {
-			result[string(match[1])] = string(s.unwrap(match[2], quote))
+			key := string(match[1])
+			val := string(match[2])
+
+			unquoted, err := strconv.Unquote(val)
+			if err == nil {
+				result[key] = unquoted
+			} else {
+				result[key] = val
+			}
 		}
 	}
 
 	return result
-}
-
-func (s *Tmux) unwrap(input, wrap []byte) []byte {
-	if bytes.HasPrefix(input, wrap) && bytes.HasSuffix(input, wrap) {
-		return bytes.TrimSuffix(bytes.TrimPrefix(input, wrap), wrap)
-	}
-
-	return input
 }

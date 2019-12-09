@@ -152,49 +152,57 @@ func TestTmuxArgs(t *testing.T) {
 func TestTmuxGetOptions(t *testing.T) {
 	tests := []struct {
 		flags string
-		scope OptionsScope
-		opts  map[string]string
+		scope Scope
+		opts  Options
 		out   []byte
 		error error
 	}{
 		{
-			opts: map[string]string{"hello-world": "FooBar"},
+			opts: Options{"hello-world": "FooBar"},
 			out:  []byte(`hello-world FooBar`),
 		},
 		{
 			scope: Server,
 			flags: "-s",
-			opts:  map[string]string{"hello-world": "Foo Bar"},
+			opts:  Options{"hello-world": "Foo Bar"},
 			out:   []byte(`hello-world "Foo Bar"`),
 		},
 		{
 			scope: GlobalSession,
 			flags: "-g",
-			opts:  map[string]string{"hello-world": "Foo Bar"},
+			opts:  Options{"hello-world": "Foo Bar"},
 			out:   []byte(`hello-world   "Foo Bar"`),
 		},
 		{
 			scope: GlobalWindow,
 			flags: "-gw",
-			opts:  map[string]string{"hello-world": "  Foo Bar   "},
+			opts:  Options{"hello-world": "  Foo Bar   "},
 			out:   []byte(`hello-world "  Foo Bar   "`),
 		},
 		{
 			scope: Window,
 			flags: "-w",
-			opts:  map[string]string{"@foo": "bar"},
+			opts:  Options{"@foo": "bar"},
 			out:   []byte(`@foo bar`),
 		},
 		{
-			opts: map[string]string{
-				"@foo":        "bar",
-				"@themepack":  "powerline/default/green",
-				"status-left": "This Is Left",
+			scope: Window,
+			flags: "-w",
+			opts:  Options{"status-left": "\"#H\" >>"},
+			out:   []byte(`status-left "\"#H\" >>"`),
+		},
+		{
+			opts: Options{
+				"@foo":         "bar",
+				"@themepack":   "powerline/default/green",
+				"status-left":  "This Is Left",
+				"status-right": "\"#H\" >>",
 			},
 			out: []byte(`
   @foo bar
 @themepack "powerline/default/green"
 status-left This Is Left
+status-right "\"#H\" >>"
 `),
 		},
 	}
