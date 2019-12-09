@@ -103,7 +103,7 @@ func TestTmuxExec(t *testing.T) {
 			assert.Equal(t, tt.out, out)
 		}
 
-		runner.AssertExpectations(t)
+		assert.True(t, runner.AssertExpectations(t))
 	}
 }
 
@@ -219,6 +219,6 @@ status-left This Is Left
 			assert.Equal(t, tt.error, err)
 		}
 
-		runner.AssertExpectations(t)
+		assert.True(t, runner.AssertExpectations(t))
 	}
 }
